@@ -379,6 +379,13 @@ MSG;
 
         $response = ADFS::generateResponse($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
+        // Normalize response
+        $doc = new DOMDocument();
+        $doc->preserveWhiteSpace = false;
+        $doc->formatOutput = false;
+        $doc->loadXML($response);
+        $response = $doc->saveXML();
+
         $configUtils = new Utils\Config();
         $privateKeyFile = $configUtils->getCertPath($idpMetadata->getString('privatekey'));
         $certificateFile = $configUtils->getCertPath($idpMetadata->getString('certificate'));
