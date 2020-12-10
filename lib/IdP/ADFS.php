@@ -160,7 +160,12 @@ MSG;
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = ['AssertionID'];
         $objXMLSecDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
-        $responsedom = DOMDocumentFactory::fromString(str_replace("\r", "", $response));
+
+        // Normalize response
+        $responsedom = DOMDocumentFactory::fromString($response);
+        $responsedom->preserveWhiteSpace = false;
+        $responsedom->formatOutput = false;
+
         $firstassertionroot = $responsedom->getElementsByTagName('Assertion')->item(0);
 
         if (is_null($firstassertionroot)) {
@@ -380,10 +385,9 @@ MSG;
         $response = ADFS::generateResponse($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
         // Normalize response
-        $doc = new DOMDocument();
+        $doc = DOMDocumentFactory::fromString($response);
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = false;
-        $doc->loadXML($response);
         $response = $doc->saveXML();
 
         $configUtils = new Utils\Config();
